@@ -24,9 +24,11 @@ computed between the rows of a data.frame in the classical form n x m,
  where n (rows) are observations and m (columns) are features.
 }
 \examples{
-## use example data:
-data(tda_test_data)
-dfDist <- dfToDistance(tda_test_data, "euclidean")
+data(vascEC_norm)
+data(vascEC_meta)
+df_TDA <- cbind(vascEC_meta, vascEC_norm)
+df_TDA <- makeTDAobj(df_TDA,outcomes = c("stage","zone"))
+df_TDA <- dfToDistance(df_TDA,'euclidean')
 
 }
 \seealso{

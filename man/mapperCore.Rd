@@ -45,15 +45,20 @@ A data.frame containing the clusters, with their elements,
 \description{
 This is a comprehensive function permitting to perform the core
 TDA Mapper algorithm with 2D lenses. It allow setting several types of
-clustering methods.
+clustering methods. There is no restriction to \code{nBins}
+and \code{mClustNode}, so the user can tune those for parameter search.
 }
 \examples{
 # use example data:
-data(tda_test_data)
-set.seed(1)
-dfMapper <- mapperCore(tda_test_data, nBins=5, overlap=0.5,
-mClustNode=2, clustMeth="kmeans")
-
+data(vascEC_norm)
+data(vascEC_meta)
+df_TDA <- cbind(vascEC_meta, vascEC_norm)
+df_TDA <- makeTDAobj(df_TDA,outcomes = c("stage","zone"))
+df_TDA <- dfToDistance(df_TDA,'euclidean')
+df_TDA <- dfToProjection(df_TDA, "PCA", nComp = 2)
+df_TDA <- mapperCore(df_TDA,
+          nBins = 5, overlap = 0.5,
+          mClustNode = 2, clustMeth = "kmeans")
 }
 \seealso{
 \code{\link{makeTDAobj}},
@@ -61,5 +66,5 @@ mClustNode=2, clustMeth="kmeans")
 \code{\link{dfToProjection}}
 }
 \author{
-Mattia Chiesa, Laura Ballarini, Luca Piacentini
+Mattia Chiesa, Laura Ballarini, Luca Piacentini, Carlo Leonardi
 }

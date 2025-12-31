@@ -14,12 +14,12 @@
 #' extracting raw counts and metadata. Thus, we filtered low expressed genes
 #' and normalized data by DaMiRseq
 #'
-#' @format A dataframe containing 1180 rows (cells) and 2 columns (outcomes)
-#'
-#' @return
-#' An example dataset for \code{PIUMA} package
-#'
-"vascEC_meta"
+#' @format A data frame with 1180 rows (cells) and 2 columns (outcomes).
+#' @usage data(vascEC_meta)
+#' @name vascEC_meta
+#' @docType data
+#' @keywords datasets
+NULL
 
 #' We tested PIUMA on a subset of the single-cell RNA Sequencing dataset
 #' (GSE:GSE193346 generated and published by Feng et al. (2022)
@@ -35,27 +35,30 @@
 #' extracting raw counts and metadata. Thus, we filtered low expressed genes
 #' and normalized data by DaMiRseq
 #'
-#' @format A matrix containing 1180 rows (cells) and 838 columns (genes)
-#'
-#' @return
-#' An example dataset for \code{PIUMA} package
-#'
-"vascEC_norm"
+#' @format A matrix with 1180 rows (cells) and 838 columns (genes).
+#' @usage data(vascEC_norm)
+#' @name vascEC_norm
+#' @docType data
+#' @keywords datasets
+NULL
 
 #' A dataset to test the \code{\link{dfToProjection}} and
 #' \code{\link{dfToDistance}} funtions of \code{PIUMA} package.
 #'
-#' @format A data.frame containing 15 rows (cells) and 15 columns (genes)
-#'
-#' @return
-#' An example dataset for \code{PIUMA} package
-#'
-"df_test_proj"
+#' @format A data frame with 15 rows (cells) and 15 columns (genes).
+#' @usage data(df_test_proj)
+#' @name df_test_proj
+#' @docType data
+#' @keywords datasets
+NULL
 
 #' A TDAobj to test the \code{PIUMA} package.
 #'
-#' @format A TDAobj with data in all slots
+#' A \code{TDAobj} with data in all slots for testing.
 #'
-#' @return
-#' An example dataset for \code{PIUMA} package
-"tda_test_data"
+#' @format A \code{TDAobj}.
+#' @usage data(tda_test_data)
+#' @name tda_test_data
+#' @docType data
+#' @keywords datasets
+NULL

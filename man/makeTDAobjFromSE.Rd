@@ -25,6 +25,10 @@ A TDA object containing:
 identified by TDA
   \item  jacc A matrix of Jaccard indexes between each pair of dfMapper nodes
   \item  node_data_mat A data.frame with the node size and the average value
+  \item  graph A list containing the igraph object derived from Jaccard matrix
+  and intermediary objects
+  \item  clustering A list containing two data.frames indicating the clustering
+  per node and per rows
   }
 }
 \description{
@@ -40,11 +44,13 @@ and create
 data("vascEC_meta")
 data("vascEC_norm")
 suppressMessages(library(SummarizedExperiment))
-dataSE <- SummarizedExperiment(assays=as.matrix(t(vascEC_norm)),
-                              colData=as.data.frame(vascEC_meta))
+dataSE <- SummarizedExperiment(
+  assays = as.matrix(t(vascEC_norm)),
+  colData = as.data.frame(vascEC_meta)
+)
 res <- makeTDAobjFromSE(dataSE, "zone")
 
 }
 \author{
-Mattia Chiesa, Laura Ballarini, Luca Piacentini
+Mattia Chiesa, Laura Ballarini, Luca Piacentini, Carlo Leonardi
 }

@@ -30,6 +30,14 @@ intrinsic characteristics of data and the mutual relations among
 See the package vignette, by typing \code{vignette("PIUMA")} to discover
 all the functions.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/BioinfoMonzino/PIUMA}
+  \item Report bugs at \url{https://github.com/BioinfoMonzino/PIUMA/issues}
+}
+
+}
 \author{
 Mattia Chiesa, Laura Ballarini, Luca Piacentini
 }

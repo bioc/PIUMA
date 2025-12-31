@@ -26,10 +26,12 @@
 #'
 #' @author Mattia Chiesa, Laura Ballarini, Luca Piacentini
 #'
-#' @docType package
 #' @name PIUMA
 #' @aliases PIUMA
 #' @keywords package
+#'
+"_PACKAGE"
+
 NULL
 
 

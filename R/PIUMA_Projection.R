@@ -35,10 +35,11 @@
 #' @author Mattia Chiesa, Laura Ballarini, Luca Piacentini
 #'
 #' @examples
-#' # use example data:
-#' data(tda_test_data)
-#' set.seed(1)
-#' cmp <- dfToProjection(tda_test_data,  "PCA", nComp=2)
+#' data(vascEC_norm)
+#' data(vascEC_meta)
+#' df_TDA <- cbind(vascEC_meta, vascEC_norm)
+#' df_TDA <- makeTDAobj(df_TDA,outcomes = c("stage","zone"))
+#' df_TDA <- dfToProjection(df_TDA,'PCA',nComp=2)
 #'
 #' @seealso
 #' \code{\link{makeTDAobj}},
@@ -48,12 +49,14 @@
 #'
 #'
 dfToProjection <- function(x,
-                           method = c("PCA",
-                                      "UMAP",
-                                      "TSNE",
-                                      "MDS",
-                                      "KPCA",
-                                      "ISOMAP"),
+                           method = c(
+                             "PCA",
+                             "UMAP",
+                             "TSNE",
+                             "MDS",
+                             "KPCA",
+                             "ISOMAP"
+                           ),
                            nComp = 2,
                            centerPCA = FALSE,
                            scalePCA = FALSE,
@@ -61,29 +64,32 @@ dfToProjection <- function(x,
                            umapMinDist = 0.1,
                            tsnePerpl = 30,
                            tsneMaxIter = 300,
-                           kpcaKernel = c("rbfdot",
-                                          "laplacedot",
-                                          "polydot",
-                                          "tanhdot",
-                                          "besseldot",
-                                          "anovadot",
-                                          "vanilladot",
-                                          "splinedot"),
+                           kpcaKernel = c(
+                             "rbfdot",
+                             "laplacedot",
+                             "polydot",
+                             "tanhdot",
+                             "besseldot",
+                             "anovadot",
+                             "vanilladot",
+                             "splinedot"
+                           ),
                            kpcaSigma = 0.1,
                            kpcaDegree = 1,
                            isomNNeigh = 5,
                            showPlot = FALSE,
                            vectColor = NULL) {
-
   # checks----------------------------------------------------------------------
-  if (!is(x,'TDAobj'))
+  if (!is(x, "TDAobj")) {
     stop("'x' argument must be a TDAobj object")
+  }
 
   df <- getScaledData(x)
 
   # check missing arguments
-  if (missing(df))
+  if (missing(df)) {
     stop("'df' argument must be provided")
+  }
 
   if (missing(method)) {
     method <- method[1]
@@ -94,256 +100,317 @@ dfToProjection <- function(x,
   }
 
   # check the type of argument
-  if (!is.data.frame(df))
+  if (!is.data.frame(df)) {
     stop("'df' argument must be a data.frame")
+  }
 
-  if (!is.character(method))
+  if (!is.character(method)) {
     stop("'method' argument must be a string")
+  }
 
-  if (!is.numeric(nComp))
+  if (!is.numeric(nComp)) {
     stop("'nComp' argument must be numeric")
+  }
 
-  if (!is.numeric(umapNNeigh))
+  if (!is.numeric(umapNNeigh)) {
     stop("'umapNNeigh' argument must be numeric")
+  }
 
-  if (!is.numeric(umapMinDist))
+  if (!is.numeric(umapMinDist)) {
     stop("'umapMinDist' argument must be numeric")
+  }
 
-  if (!is.numeric(tsnePerpl))
+  if (!is.numeric(tsnePerpl)) {
     stop("'tsnePerpl' argument must be numeric")
+  }
 
-  if (!is.numeric(tsneMaxIter))
+  if (!is.numeric(tsneMaxIter)) {
     stop("'tsneMaxIter' argument must be numeric")
+  }
 
-  if (!is.character(kpcaKernel))
+  if (!is.character(kpcaKernel)) {
     stop("'kpcaKernel' argument must be a string")
+  }
 
-  if (!is.numeric(kpcaSigma))
+  if (!is.numeric(kpcaSigma)) {
     stop("'kpcaSigma' argument must be numeric")
+  }
 
-  if (!is.numeric(kpcaDegree))
+  if (!is.numeric(kpcaDegree)) {
     stop("'kpcaDegree' argument must be numeric")
+  }
 
-  if (!is.numeric(isomNNeigh))
+  if (!is.numeric(isomNNeigh)) {
     stop("'isomNNeigh' argument must be numeric")
+  }
 
-  if (!is.logical(showPlot))
+  if (!is.logical(showPlot)) {
     stop("'showPlot' argument must be TRUE or FALSE")
+  }
 
-  if (!is.factor(vectColor) & !is.numeric(vectColor) & !is.integer(vectColor)
-      & !is.null(vectColor))
+  if (!is.factor(vectColor) & !is.numeric(vectColor) & !is.integer(vectColor) &
+    !is.null(vectColor)) {
     stop("'vectColor' argument must be: factor, numeric, integer or NULL")
+  }
 
   # specific checks
-  if (nrow(df) < 10)
+  if (nrow(df) < 10) {
     stop("num. of 'df' rows must be greater than 10")
+  }
 
-  if (ncol(df) < 2)
+  if (ncol(df) < 2) {
     stop("num. of 'df' columns must be greater than 2")
+  }
 
-  if (!(all(vapply(df, is.numeric,logical(1))) |
-        all(vapply(df, is.integer,logical(1))))
-  )
+  if (!(all(vapply(df, is.numeric, logical(1))) |
+    all(vapply(df, is.integer, logical(1))))
+  ) {
     stop("'df' variables must be numeric")
+  }
 
-  if (length(method) > 1)
+  if (length(method) > 1) {
     stop("length(method) must be equal to 1")
+  }
 
-  if (!(method %in% c("PCA","UMAP", "TSNE", "MDS", "KPCA",
-                      "isomap")))
+  if (!(method %in% c(
+    "PCA", "UMAP", "TSNE", "MDS", "KPCA",
+    "isomap"
+  ))) {
     stop("'method' must be one of 'PCA','UMAP', 'TSNE', 'MDS', 'KPCA',
          'isomap'")
+  }
 
-  if (length(nComp) > 1)
+  if (length(nComp) > 1) {
     stop("length(nComp) must be equal to 1")
+  }
 
-  if ((nComp %%1) != 0)
+  if ((nComp %% 1) != 0) {
     stop("'nComp' must be integer")
+  }
 
-  if (!(nComp >= 2 & nComp <= ncol(df)))
+  if (!(nComp >= 2 & nComp <= ncol(df))) {
     stop("'nComp' must be lower than the number of 'df' columns")
+  }
 
-  if (method %in% "UMAP"){
-    if (length(umapNNeigh) > 1)
+  if (method %in% "UMAP") {
+    if (length(umapNNeigh) > 1) {
       stop("length(umapNNeigh) must be equal to 1")
+    }
 
-    if ((umapNNeigh %% 1) != 0)
+    if ((umapNNeigh %% 1) != 0) {
       stop("'umapNNeigh' must be integer")
+    }
 
 
-    if (!(umapNNeigh >= 2 & umapNNeigh <= round(nrow(df))/4))
+    if (!(umapNNeigh >= 2 & umapNNeigh <= round(nrow(df)) / 4)) {
       stop("'umapNNeigh' must be in [2; N/4], with N = n. of 'df' rows")
+    }
 
-    if (length(umapMinDist) > 1)
+    if (length(umapMinDist) > 1) {
       stop("length(umapMinDist) must be equal to 1")
+    }
 
-    if (!(umapMinDist >= 0 & umapMinDist < 1))
+    if (!(umapMinDist >= 0 & umapMinDist < 1)) {
       stop("'umapMinDist' must be in [0; 1)")
-
+    }
   }
 
-  if (method %in% "TSNE"){
-    if (length(tsnePerpl) > 1)
+  if (method %in% "TSNE") {
+    if (length(tsnePerpl) > 1) {
       stop("length(tsnePerpl) must be equal to 1")
+    }
 
-    if ((tsnePerpl %% 1) != 0)
+    if ((tsnePerpl %% 1) != 0) {
       stop("'tsnePerpl' must be integer")
+    }
 
-    if (!(tsnePerpl >= 3 & tsnePerpl <= round(nrow(df))/3))
+    if (!(tsnePerpl >= 3 & tsnePerpl <= round(nrow(df)) / 3)) {
       stop("'tsnePerpl' must be in [3; N/3], with N = n. of 'df' rows")
+    }
 
-    if (length(tsneMaxIter) > 1)
+    if (length(tsneMaxIter) > 1) {
       stop("length(tsneMaxIter) must be equal to 1")
+    }
 
-    if ((tsneMaxIter %% 1) != 0)
+    if ((tsneMaxIter %% 1) != 0) {
       stop("'tsneMaxIter' must be integer")
+    }
 
-    if (!(tsneMaxIter >= 100 & tsneMaxIter <= 3000))
+    if (!(tsneMaxIter >= 100 & tsneMaxIter <= 3000)) {
       stop("'tsneMaxIter' must be in [100; 3000]")
+    }
   }
 
-  if (method %in% "KPCA"){
-    if (length(kpcaKernel) > 1)
+  if (method %in% "KPCA") {
+    if (length(kpcaKernel) > 1) {
       stop("length(kpcaKernel) must be equal to 1")
+    }
 
-    if (!(kpcaKernel %in% c("rbfdot", "laplacedot", "polydot", "tanhdot",
-                            "besseldot", "anovadot", "vanilladot",
-                            "splinedot")))
+    if (!(kpcaKernel %in% c(
+      "rbfdot", "laplacedot", "polydot", "tanhdot",
+      "besseldot", "anovadot", "vanilladot",
+      "splinedot"
+    ))) {
       stop("'kpcaKernel' must be one of 'rbfdot', 'laplacedot', 'polydot',
          'tanhdot', 'besseldot', 'anovadot', 'vanilladot', 'splinedot'")
+    }
 
-    if (length(kpcaSigma) > 1)
+    if (length(kpcaSigma) > 1) {
       stop("length(kpcaSigma) must be equal to 1")
+    }
 
-    if (!(kpcaSigma > 0 & kpcaSigma <= 5))
+    if (!(kpcaSigma > 0 & kpcaSigma <= 5)) {
       stop("'kpcaSigma' must be in (0; 5]")
+    }
 
-    if (length(kpcaDegree) > 1)
+    if (length(kpcaDegree) > 1) {
       stop("length(kpcaDegree) must be equal to 1")
+    }
 
-    if ((kpcaDegree %% 1) != 0)
+    if ((kpcaDegree %% 1) != 0) {
       stop("'kpcaDegree' must be integer")
+    }
 
-    if (!(kpcaDegree >=1 & kpcaDegree <= 3))
+    if (!(kpcaDegree >= 1 & kpcaDegree <= 3)) {
       stop("'kpcaDegree' must be in [1; 3]")
-
+    }
   }
 
-  if (method %in% "isomap"){
-    if (length(isomNNeigh) > 1)
+  if (method %in% "isomap") {
+    if (length(isomNNeigh) > 1) {
       stop("length(isomNNeigh) must be equal to 1")
+    }
 
-    if ((isomNNeigh %% 1) != 0)
+    if ((isomNNeigh %% 1) != 0) {
       stop("'isomNNeigh' must be integer")
+    }
 
-    if (!(isomNNeigh >= 2 & isomNNeigh <= round( (nrow(df))/4) ))
+    if (!(isomNNeigh >= 2 & isomNNeigh <= round((nrow(df)) / 4))) {
       stop("'isomNNeigh' must be in [2; N/4], with N = n. of 'df' rows")
+    }
   }
 
-  if (length(showPlot) > 1)
+  if (length(showPlot) > 1) {
     stop("length(showPlot) must be equal to 1")
+  }
 
-  if(!is.null(vectColor)){
-    if(length(vectColor) != nrow(df)){
+  if (!is.null(vectColor)) {
+    if (length(vectColor) != nrow(df)) {
       stop("length(vectColor) is different from the number of df rows")
     }
   }
 
 
   # check the presence of NA or Inf
-  if (any(is.na(df)))
+  if (any(is.na(df))) {
     stop("NA values are not allowed in the 'df' data.frame")
+  }
 
-  if (any(is.infinite(as.matrix(df))))
+  if (any(is.infinite(as.matrix(df)))) {
     stop("Inf values are not allowed in the 'df' data.frame")
+  }
 
-  if(!is.null(vectColor)){
-    if(any(is.na(vectColor)))
+  if (!is.null(vectColor)) {
+    if (any(is.na(vectColor))) {
       warning("NA values are not allowed in 'vectColor'")
-    if(any(is.infinite(vectColor)))
+    }
+    if (any(is.infinite(vectColor))) {
       warning("Inf values are not allowed in 'vectColor'")
+    }
   }
 
   # compute the projection (body)----------
-  switch(method, "PCA"={
+  switch(method,
+    "PCA" = {
+      pcaRes <- prcomp(df, center = centerPCA, scale. = scalePCA, rank. = nComp)
+      allCmp <- as.data.frame(pcaRes$x)
 
-    pcaRes <- prcomp(df, center = centerPCA, scale. = scalePCA, rank.= nComp)
-    allCmp<-as.data.frame(pcaRes$x)
+      # percentage of explained variance
+      explVar <- round(pcaRes$sdev^2 / sum(pcaRes$sdev^2) * 100)
+      vectNumComp <- seq_len(nComp)
+      s <- paste0("comp", vectNumComp, " = ", explVar[seq_len(nComp)], "%",
+        collapse = ", "
+      )
+      s <- strsplit(s, split = ", ", fixed = TRUE)
+    },
+    "UMAP" = {
+      # create a new settings object
+      custom.settings <- umap.defaults
+      custom.settings$n_neighbors <- umapNNeigh
+      custom.settings$n_components <- nComp
+      custom.settings$input <- "data"
+      custom.settings$min_dist <- umapMinDist
 
-    # percentage of explained variance
-    explVar <- round(pcaRes$sdev^2/sum(pcaRes$sdev^2)*100)
-    vectNumComp <- seq_len(nComp)
-    s <- paste0("comp", vectNumComp, " = ", explVar[seq_len(nComp)], "%",
-                collapse=", ")
-    s <- strsplit(s, split=", ", fixed=TRUE)
-
-
-  },"UMAP"={
-
-    # create a new settings object
-    custom.settings <- umap.defaults
-    custom.settings$n_neighbors <- umapNNeigh
-    custom.settings$n_components <- nComp
-    custom.settings$input <- "data"
-    custom.settings$min_dist <- umapMinDist
-
-    umapRes <- umap(df, config = custom.settings, preserve.seed = TRUE)
-    allCmp <- as.data.frame(umapRes$layout)
-
-  },"TSNE"={
-
-    tsneRes <- tsne(df, k = nComp, perplexity = tsnePerpl,
-                    max_iter = tsneMaxIter)
-    allCmp <- as.data.frame(tsneRes)
-
-  },"MDS"={
-
-    distance <- dist(df, method = "euclidean")
-    mdsRes <- cmdscale(distance, k = nComp)
-    allCmp<-as.data.frame(mdsRes)
-
-  },"KPCA"={
-
-    if (kpcaKernel %in% c("rbfdot", "laplacedot")) {
-      kpcaRes <- kpca(as.matrix(df), kernel = kpcaKernel,
-                      kpar=list(sigma = kpcaSigma), features = nComp)
-    } else if (kpcaKernel %in% "polydot") {
-      kpcaRes <- kpca(as.matrix(df), kernel = kpcaKernel,
-                      kpar = list(degree = kpcaDegree, scale = 1, offset = 1),
-                      features = nComp)
-    } else if (kpcaKernel %in% "tanhdot") {
-      kpcaRes <- kpca(as.matrix(df), kernel = kpcaKernel,
-                      kpar = list(scale = 1, offset = 1), features = nComp)
-    } else if (kpcaKernel %in% "besseldot") {
-      kpcaRes <- kpca(as.matrix(df), kernel = kpcaKernel,
-                      kpar = list(sigma = kpcaSigma, order = 1,
-                                  degree = kpcaDegree), features=nComp)
-    } else if (kpcaKernel %in% "anovadot") {
-      kpcaRes <- kpca(as.matrix(df), kernel = kpcaKernel,
-                      kpar = list(sigma = kpcaSigma, degree = kpcaDegree),
-                      features = nComp)
-    } else if (kpcaKernel %in% c("vanilladot", "splinedot")){
-      kpcaRes <- kpca(as.matrix(df), kernel = kpcaKernel, kpar = list(),
-                      features = nComp)
-    } else {
-      stop("'kpcaKernel' must be one of 'rbfdot', 'laplacedot', 'polydot',
+      umapRes <- umap(df, config = custom.settings, preserve.seed = TRUE)
+      allCmp <- as.data.frame(umapRes$layout)
+    },
+    "TSNE" = {
+      tsneRes <- tsne(df,
+        k = nComp, perplexity = tsnePerpl,
+        max_iter = tsneMaxIter
+      )
+      allCmp <- as.data.frame(tsneRes)
+    },
+    "MDS" = {
+      distance <- dist(df, method = "euclidean")
+      mdsRes <- cmdscale(distance, k = nComp)
+      allCmp <- as.data.frame(mdsRes)
+    },
+    "KPCA" = {
+      if (kpcaKernel %in% c("rbfdot", "laplacedot")) {
+        kpcaRes <- kpca(as.matrix(df),
+          kernel = kpcaKernel,
+          kpar = list(sigma = kpcaSigma), features = nComp
+        )
+      } else if (kpcaKernel %in% "polydot") {
+        kpcaRes <- kpca(as.matrix(df),
+          kernel = kpcaKernel,
+          kpar = list(degree = kpcaDegree, scale = 1, offset = 1),
+          features = nComp
+        )
+      } else if (kpcaKernel %in% "tanhdot") {
+        kpcaRes <- kpca(as.matrix(df),
+          kernel = kpcaKernel,
+          kpar = list(scale = 1, offset = 1), features = nComp
+        )
+      } else if (kpcaKernel %in% "besseldot") {
+        kpcaRes <- kpca(as.matrix(df),
+          kernel = kpcaKernel,
+          kpar = list(
+            sigma = kpcaSigma, order = 1,
+            degree = kpcaDegree
+          ), features = nComp
+        )
+      } else if (kpcaKernel %in% "anovadot") {
+        kpcaRes <- kpca(as.matrix(df),
+          kernel = kpcaKernel,
+          kpar = list(sigma = kpcaSigma, degree = kpcaDegree),
+          features = nComp
+        )
+      } else if (kpcaKernel %in% c("vanilladot", "splinedot")) {
+        kpcaRes <- kpca(as.matrix(df),
+          kernel = kpcaKernel, kpar = list(),
+          features = nComp
+        )
+      } else {
+        stop("'kpcaKernel' must be one of 'rbfdot', 'laplacedot', 'polydot',
             'tanhdot', 'besseldot', 'anovadot', 'vanilladot', 'splinedot'")
+      }
+
+      allCmp <- as.data.frame(kpcaRes@pcv)
+    },
+    "isomap" = {
+      df <- as.data.frame(as.matrix(dist(df, method = "euclidean")))
+      isomapRes <- isomap(df, ndim = nComp, k = isomNNeigh)
+      allCmp <- as.data.frame(isomapRes[["points"]][, seq_len(nComp)])
     }
-
-    allCmp <- as.data.frame(kpcaRes@pcv)
-
-  }, "isomap"={
-    df <- as.data.frame(as.matrix(dist(df, method = "euclidean")))
-    isomapRes <- isomap(df, ndim = nComp, k = isomNNeigh)
-    allCmp <- as.data.frame(isomapRes[["points"]][, seq_len(nComp)])
-
-  })
+  )
 
   colnames(allCmp) <- rep(paste0("comp", seq_len(ncol(allCmp))))
   rownames(allCmp) <- rownames(df)
 
   # scatter plot
-  if (showPlot){
+  if (showPlot) {
     plot_projection_plot(allCmp, vectColor, method)
   }
 

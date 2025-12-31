@@ -14,27 +14,31 @@ checkScaleFreeModel(x, showPlot = FALSE)
 \value{
 A list containing:
 \itemize{
+   \item connectivity of the resulting graph
    \item the estimated gamma value
-   \item The correlation between the k and the degree distribution p(k).
+   \item the correlation between degree \(k\) and its distribution \(p(k)\).
    \item The p-value of the correlation between the k and the degree
    distribution p(k).
    \item The correlation between the logarithm (base 10) of k and the
    logarithm (base 10) of the degree distribution p(k).
    \item The p-value of the correlation between the logarithm (base 10) of k
    and the logarithm (base 10) of the degree distribution p(k).
-   }
+   \item A composite score reflecting how strongly power‐law behavior
+   coexists with graph cohesion, computed as the absolute product between
+   cor(P(k)*k) and connectivity}
 }
 \description{
 This function assesses the fitting to a scale-free net model.
 }
 \details{
-The scale-free networks show a high negative correlation beween k
+The scale-free networks show a high negative correlation beztween k
 and p(k).
 }
 \examples{
 ## use example data:
 data(tda_test_data)
-#netModel <- checkScaleFreeModel(tda_test_data)
+netModel <- checkScaleFreeModel(tda_test_data)
+print(netModel)
 
 }
 \seealso{
@@ -45,5 +49,5 @@ data(tda_test_data)
 \code{\link{jaccardMatrix}}
 }
 \author{
-Mattia Chiesa, Laura Ballarini,Luca Piacentini
+Mattia Chiesa, Laura Ballarini, Luca Piacentini, Carlo Leonardi
 }

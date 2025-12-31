@@ -1,11 +1,6 @@
 ---
 title: "The PIUMA package - Phenotypes Identification Using Mapper from topological data Analysis"
 author:
-  - name: Mattia Chiesa
-    affiliation: 
-    - Bioinformatics and Aritificial Intelligence facility, Centro Cardiologico Monzino, IRCCS, Milan, Italy
-    - Department of Electronics, Information and Biomedical Engineering, Politecnico di Milano, Milan, Italy
-    email: mattia.chiesa@cardiologicomonzino.it
   - name: Laura Ballarini
     affiliation:   
     - Bioinformatics and Aritificial Intelligence facility, Centro Cardiologico Monzino, IRCCS, Milan, Italy
@@ -16,9 +11,17 @@ author:
     affiliation: Dipartimento di Ingegneria Industrale e dell Informazione, Universita' degli studi di Pavia, Pavia, Italy
   - name: Arianna Dagliati
     affiliation: Dipartimento di Ingegneria Industrale e dell Informazione, Universita' degli studi di Pavia, Pavia, Italy
+  - name: Carlo Leonardi
+    affiliation: Wellcome Sanger Institute, Cambridge, UK  
   - name: Luca Piacentini
     affiliation: Bioinformatics and Aritificial Intelligence facility, Centro Cardiologico Monzino, IRCCS, Milan, Italy
+  - name: Mattia Chiesa
+    affiliation: 
+    - Bioinformatics and Aritificial Intelligence facility, Centro Cardiologico Monzino, IRCCS, Milan, Italy
+    - Department of Electronics, Information and Biomedical Engineering, Politecnico di Milano, Milan, Italy
+    email: mattia.chiesa@cardiologicomonzino.it
     
+
 package: PIUMA
 output:
   BiocStyle::html_document:
@@ -31,6 +34,9 @@ vignette: |
 editor_options: 
   markdown: 
     wrap: 80
+    
+    
+
 ---
 
 ```{r, include=FALSE}
@@ -40,15 +46,20 @@ knitr::opts_chunk$set(
 )
 ```
 
-<img src="Logo.svg" height="140" style="position:absolute;top:30px;right:0px;"/>
+<img src="Logo.svg" height="140" style="position:absolute;top:30px;right:-480px;"/>
+
 
 # Introduction
 
 This guide provides an overview of the PIUMA [^1] package, a comprehensive R
 package for performing Topological Data Analysis on high-dimensional datasets,
-such as -omics data.
+such as -omics data. As of version 1.6 of PIUMA, we provided two 
+tutorials for TDA in R using PIUMA, one as a basic end-to-end pipeline to do 
+community mining, and the other one to showcase the application
+of TDA using Seurat objects, making a specific case for single-cell data 
+processing.
 
-[^1]: PIUMA is the italian word for feather
+[^1]: PIUMA is the Italian word for feather
 
 ## Motivation
 
@@ -57,7 +68,7 @@ observable traits or phenotypic characteristics. In the context of medicine and
 biology, phenotyping involves the systematic analysis and measurement of various
 physical, physiological, and behavioral features of individuals, such as height,
 weight, blood pressure, biochemical markers, imaging data, and more. Phenotyping
-plays a crucial role in precision medicine as it provides essential data for
+plays a crucial role in precision medicine as it provides essential knowledge for
 understanding individual health characteristics and disease manifestations, by
 combining data from different sources to gain comprehensive insights into an
 individual's health status and disease risk. This integrated approach allows for
@@ -81,10 +92,21 @@ relationships among observations, by presenting complex data in a graph-based
 representation. Indeed, building topological models as networks, TDA allows
 complex diseases to be inspected in a continuous space, where subjects can
 'fluctuate' over the graph, sharing, at the same time, more than one adjacent
-node of the network [@dagliati2020using]. Overall, TDA offers a powerful set of
-tools to capture the underlying topological features of data, revealing
-essential patterns and relationships that might be hidden from traditional
-statistical techniques [@casaclang2019network].
+node of the network [@dagliati2020using]. 
+Overall, TDA offers a powerful set of tools to capture the underlying
+topological features of data, revealing essential patterns and relationships
+that might be hidden from traditional statistical techniques
+[@casaclang2019network].
+
+# News in Version PIUMA 1.6
+
+PIUMA 1.6 is a major release that brings true end-to-end TDA workflows to R.
+The headline feature is embedded, TDA-guided, geometry-informed community 
+mining: new functions operate directly on the TDAobj class so you can run 
+Mapper-based community detection entirely in R, with special emphasis on 
+TDA-driven clustering for scRNA-seq atlases.
+
+You can check out the integrative vignette for seamless use with Seurat.
 
 # Installation
 
@@ -98,7 +120,11 @@ if (!require("BiocManager", quietly = TRUE)) {
 BiocManager::install("PIUMA")
 ```
 
-# Tutorial
+# Scope of this Vignette
+
+This vignette is intended to offer to the user the basic pipeline and usage of 
+PIUMA, using a scRNAseq dataset as an example. Mapper() output will be taken
+using reasonable but arbitrary hyperparameters. 
 
 ## The testing dataset
 
@@ -172,8 +198,8 @@ head(df_TDA[1:5, 1:7])
 
 The PIUMA package comes with a dedicated data structure to easily store the
 information gathered from all the steps performed by a Topological Data
-Analysis. As shown in the following cartoon, this object, called `TDAobj`, is an
-S4 class containing 9 slots:
+Analysis. As in the version 1.6 of PIUMA, this object, called `TDAobj`, is an S4
+class containing 11 slots:
 
 -   `orig_data`: `data.frame` with the original data (**without** outcomes)
 -   `scaled_data`: `data.frame` with re-scaled data (**without** outcomes)
@@ -184,8 +210,11 @@ S4 class containing 9 slots:
 -   `dfMapper`: `data.frame` containing the nodes, with their elements,
 -   `jacc`: `matrix` of Jaccard indexes between each pair of `dfMapper` nodes
 -   `node_data_mat`: `data.frame` with the node size and the average value
+-   `graph` : `list` containing the Jaccard matrix transformed in igraph object
+-   `clustering` : `list` containing two essential data.frames with topological
+    clustering information per nodes and per observation
 
-<img src="TDAobj.svg"/>
+<img src="TDAobj.svg" height="400" />
 
 The `makeTDAobj` function allows users to 1) generate the TDAobj from a
 `data.frame`, 2) select one or more variables to be considered as outcome, and
@@ -196,10 +225,13 @@ TDA_obj <- makeTDAobj(df_TDA, c("stage","zone"))
 
 ```
 
-For genomic data, such as RNA-Seq or scRNA-Seq, we have also developed a custom function to import a `r Biocpkg("SummarizedExperiment")` object into PIUMA:
+For genomic data, such as RNA-Seq or scRNA-Seq, we have also developed a custom
+function to import a `r Biocpkg("SummarizedExperiment")` object into PIUMA:
+
 ```{r, chunk-3_1,warning=FALSE, eval=FALSE}
 data("vascEC_meta")
 data("vascEC_norm")
+library(SummarizedExperiment)
 
 dataSE <- SummarizedExperiment(assays=as.matrix(t(vascEC_norm)),
                                colData=as.data.frame(vascEC_meta))
@@ -285,7 +317,7 @@ thought to implement a 2-dimensional lens function and then apply one of the 4
 well-known clustering algorithm: '*k-means*', '*hierarchical clustering*',
 *DBSCAN* or *OPTICS*.
 
-```{r,chunk-5, fig.width=10, fig.height=10,warning=FALSE}
+```{r,chunk-5-1, fig.width=10, fig.height=10,warning=FALSE}
 TDA_obj <- mapperCore(TDA_obj,
                        nBins = 15,
                        overlap = 0.3,
@@ -305,17 +337,18 @@ overlapping by **30%** with the adjacent ones. The **k-means** algorithm is,
 then, applied on the sample belonging to each 'squared' bin. In this example,
 the Mapper aggregated samples in 369 partially overlapping clusters. Indeed, as
 shown in the previous code chunk, the nodes `node_102_cl_1` and `node_117_cl_1`
-shared 2 out of 4 cells.
+shared 2 out of 4 cells. 
 
 ## Nodes Similarity and Enrichment
 
-The output of mapper is a `data.frame`, stored in the `dfMapper` slot, in which
-each row represents a group of samples (here, a group of cells), called
-'**node'** in network theory jargon. PIUMA allows the users to also generate a
-matrix that specifies the similarity between nodes **'edge'** allowing to
-represent the data as a network. Since the similarity, in this context, consists
-of the number of samples, shared by nodes, PIUMA implements a function
-(`jaccardMatrix`) to calculate the Jaccard's index between each pairs of nodes.
+Once chosen the hyperparameters, the output of mapper is a `data.frame`, 
+stored in the `dfMapper` slot, in which each row represents a group of samples 
+(here, a group of cells), called '**node'** in network theory jargon. 
+PIUMA allows the users to also generate a matrix that specifies the similarity 
+between nodes **'edge'** allowing to represent the data as a network. 
+Since the similarity, in this context, consists of the number of samples, 
+shared by nodes, PIUMA implements a function (`jaccardMatrix`) to calculate the 
+Jaccard's index between each pairs of nodes.
 
 ```{r,chunk-6, fig.width=10, fig.height=10,warning=FALSE}
 # Jaccard Matrix
@@ -333,7 +366,7 @@ belonging to specific nodes. Generally, this step is called 'Node Enrichment'.
 In addition the size of each node is also appended to the output `data.frame`
 (the last column name is 'size').
 
-```{r,chunk-7, fig.width=10, fig.height=10,warning=FALSE}
+```{r,chunk-7-1, fig.width=10, fig.height=10,warning=FALSE}
 TDA_obj <- tdaDfEnrichment(TDA_obj,
                            cbind(getScaledData(TDA_obj),
                                  getOutcome(TDA_obj)))
@@ -345,16 +378,15 @@ Printing the last 5 columns of the `data.frame` returned by `tdaDfEnrichment`
 for 4 mitochondrial genes as well as the number of samples belonging to the
 nodes.
 
-## Network assessment
+## Network Assessment
 
-TDA requires several parameters to be set, such as the type of projection
-algorithm, the distance metrics, the number of overlapping bins, the percentage
-of overlap, and the clustering techniques. Moreover, often, specific algorithm
-parameters need to be chosen, such as the number of UMAP neighbors. This means
-that TDA analysis should be repeated several times, varying the hyperparameters
-to find the suitable combination ('grid search' approach) and an evaluation
-metrics is needed to assess each result. PIUMA implements two different
-strategies to ass
+The geometry of the resulting TDA output graph may reveal hints on data organisation.
+Inferring the geometry of a graph from a TDA output and applying an appropriate clustering method,
+which is the main core and objective of PIUMA, might revel interesting communities. 
+In particular, not all geometries are the same: biological datasets sometimes harbor scale-free hubs, 
+so PIUMA also provides 
+complementary strategies to reassess your network from a scale-free perspective. 
+In particular, PIUMA implements two different strategies:
 
 -   `supervised approach`, usually called **'anchoring'**, in which the entropy
     of the network generated by TDA is calculated averaging the entropies of
@@ -367,10 +399,16 @@ strategies to ass
     the probability that a node has k links follows $$P(k) \sim  k^{-\gamma}$$,
     where $k$ is a node degree (*i.e.*, the number of its connections), $\gamma$
     is a degree exponent, and $P(k)$ is the frequency of nodes with a specific
-    degree.Degree exponents between $2 < \gamma < 3$ have been observed in most
+    degree. Degree exponents between $2 < \gamma < 3$ have been observed in most
     biological and social networks. Forcing our network to be scale-free ensures
     to unveil communities in our data. The higher the correlation between P(k)
-    and k, in log-log scale, the better the network.
+    and k, in log-log scale, the better the network. We also introduced a
+    measure of connectivity of the Mapper() output as well as a 'Product Score' 
+    defined as (|corlogklogpk| × Connectivity) that simultaneously rewards 
+    scale-free behavior and overall graph cohesion. We introduced this 
+    correction since very sparse networks with many isolated nodes may appear 
+    scale-free but are not useful for data representation.
+
 
 ```{r,chunk-8, fig.width=10, fig.height=10,warning=FALSE, eval=TRUE, fig.cap = "Power-law degree distribution. The correlation between P(k) (y-axis) and k (x-axis) is represented in linear scale (on the left) and in log-log scale (on the right). The regression line (orange line) is also provided."}
 # Anchoring (supervised)
@@ -382,20 +420,155 @@ netModel <- checkScaleFreeModel(TDA_obj, showPlot = TRUE)
 netModel
 ```
 
-In this example, we tested both the approaches even if the unsupervised one is
-preferable as no prior knowledge (*i.e.*, outcome) is needed to assess the
-network. We got a global entropy of 1.3 and correlations between P(k) and k
-equal to -0.75 and -0.58, with data in linear scale or log-log scale,
-respectively. PIUMA provides users also with the $\gamma$ value, so that it is
-easy to assess if the network is scale-free ($2 < \gamma < 3$) or not. In this
-case, $\gamma$ is equal to 2.09, meaning that the network can be considered
-scale-free. Overall, the entropy, the correlation between P(k) and k (linear or
-log-log scale), and/or the $\gamma$ value, provided by `checkNetEntropy` and
-`checkScaleFreeModel`, could be used to compare different sets of
-hyper-parameters, such as different lenses, space reduction algorithms and
-Mapper arguments.
+Although the anchoring metric can be valuable when you already know class 
+labels, the unsupervised power-law fit is often preferable because it requires 
+no prior knowledge In our example, we obtained a 
+global entropy of 1.3, Pearson correlations of –0.75 (linear) and –0.58 
+(log–log), and an estimated $\gamma$ of 2.09, confirming scale-free structure 
+ (a typical scale-free network has ($2 < \gamma < 3$)). 
+By comparing entropy, correlation or exponent,by using `checkNetEntropy` and 
+`checkScaleFreeModel`, across different parameters you can select the 
+configuration that most faithfully uncovers community structure in your data.
+Moreover, the connectivity of the network is 0.89, while the ProductScore is 
+0.53. A connectivity below 1.0 tells us that the graph is not fully unified but 
+comprises more than one substantial subgraph, hinting that it is only partially 
+fragmented. At the same time, a moderate 'Product Score' suggests a meaningful 
+power-law signature among those connected nodes. 
+Taken together, these metrics point to a scale-free topology, marked by 
+prominent hub nodes. To assign a predicted geometry quickly, with sensible 
+thresholds and fallbacks for non-SF cases, we implemented the 
+`predict_mapper_class()` function:
 
-## Export data for Cytoscape
+```{r,chunk-predict-mapper, warning=FALSE, eval=TRUE}
+# quick inference of geometry, metrics-based
+TDA_obj <- jaccardMatrix(TDA_obj)
+TDA_obj <- setGraph(TDA_obj)
+TDA_obj <- predict_mapper_class(TDA_obj, verbose = TRUE)
+```
+
+This function simply uses heuristics to propose the most likely network topology
+
+## Cluster assignment
+Once the structure of network has been assessed, the last key point is to properly 
+identify a clusters in the network, and, thus, to assign cluster categories to each network node and each observation. PIUMA implements its own algorithm to detect clusters (Paragraph 4.7.1), while offers an easy way to perform clustering outside the package, for example using Cytoscape, a well-known tools for handling graphs (Paragraph 4.7.2)
+
+
+
+### Geometry-guided Community Mining of TDA Mapper() Graph
+
+Once the Mapper pipeline has produced a fully populated TDA_obj, complete with 
+its graph structure, Jaccard similarity matrix, and igraph representation, you 
+can invoke our geometry-aware clustering routine with a single call to 
+`autoClusterMapper`. This function  selects the most appropriate 
+community-finding algorithm based on the predicted graph geometry, 
+while still allowing you to override its choice if you prefer a different method.
+Under the hood, we map each canonical geometry to the algorithm best 
+suited to its topological signature:
+
+-   **Scale-free** or **configuration models** (`SF/CM`) are handled by 
+    fast-greedy modularity optimization, which excels at revealing 
+    hub-centric structures.
+-   **Small-world** graphs (`WS`) leverage the walktrap algorithm’s ability to 
+    follow short random walks and uncover locally dense regions.
+-   **Random geometric** graphs (`RGG`) employ edge-betweenness community 
+    detection to separate spatial clusters by cutting the highest-traffic 
+    links.
+-   **Stochastic block models** (`SBM`) use optimal modularity to isolate 
+    block-structured communities.
+-   **Erdős–Rényi** graphs (`ER`) fall back on label-propagation, which 
+    naturally diffuses labels across a uniformly random network.
+
+This principled pairing of geometry and algorithm not only speeds up community 
+discovery but also ensures that the resulting clusters respect the intrinsic 
+shape of the data, yielding biologically meaningful modules that might be 
+overlooked by generic clustering approaches.
+
+In practice, if the automatic geometry mapping underperforms, **walktrap** is a 
+solid fallback that works well across many Mapper graphs.
+
+```{r,clustering-1, fig.width=10, fig.height=10, warning=FALSE, eval=TRUE}
+TDA_obj <- autoClusterMapper(TDA_obj,method = 'automatic')
+```
+
+We then merge the resulting cluster assignments with our UMAP coordinates and 
+plot each heart chamber in a faceted scatterplot, labeling only the 
+non-singleton clusters:
+
+```{r,clustering-2, fig.width=12, fig.height=12, warning=FALSE, eval=TRUE,fig.cap = "Geometry-guided Clustering on Mapper()'s Graph. Four scatter plots are drawn, using the first 2 components identified by UMAP, faceting for each specific heart chamber. Cells are colored for the topological clusters identified with PIUMA. Topological clusters are also labelled on the graph, while Singletons are excluded."}
+library(ggrepel)
+library(dplyr)
+
+# plot point-cloud based on stage and zone
+df_plot <- as.data.frame(cbind(getOutcomeFact(TDA_obj),
+                                getComp(TDA_obj)), 
+                         stringAsFactor = TRUE)
+
+df_plot$cell_id <- rownames(df_plot)  
+df_plot <- merge(df_plot, TDA_obj@clustering$obs_cluster, 
+                 by.x = "cell_id", by.y = "obs", all.x = TRUE)
+
+centroids <- df_plot %>%
+  group_by(zone, cluster) %>%
+  summarize(
+    n_cells = dplyr::n(),
+    comp1 = mean(comp1, na.rm = TRUE),
+    comp2 = mean(comp2, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  filter(!grepl("^Singleton", as.character(cluster)))  # Exclude singleton clusters
+
+ggplot(df_plot, aes(x = comp1, y = comp2, color = factor(cluster))) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_label_repel(
+    data = centroids,
+    aes(label = cluster, fill = factor(cluster)),
+    color = "white",
+    fontface = "bold",
+    box.padding = 0.5,
+    segment.color = NA,
+    min.segment.length = 0
+  ) +
+  facet_wrap(~ zone) +
+  labs(color = "Cluster",
+       title = "Geometry-Guided Community Detection",
+       subtitle = "Cluster centroids labeled (singletons excluded)",
+       caption = "Singleton clusters shown without labels") +
+  theme_minimal() +
+  scale_color_viridis_d(option = "D") +
+  scale_fill_viridis_d(option = "D", guide = "none")
+
+#for more inspection: obs X clusters
+head(TDA_obj@clustering$obs_cluster)
+
+# nodes X obs X clusters
+head(TDA_obj@clustering$nodes_cluster)
+```
+
+We can see that clusters appear distinctly in defined zones of the UMAP in this
+faceted view per anatomical region. Our geometry-guided approach prioritizes 
+communities formed by connected graph components, excluding disconnected 
+singletons that lack structural relevance to the underlying geometry. 
+We observe well-defined cluster boundaries in the embedding space, indicating 
+that identified communities represent biologically meaningful cellular groupings 
+rather than scattered artifacts.
+
+Two key outputs let you explore the results in detail:
+
+-`obs_cluster`: A table mapping each observation (cell) to its assigned cluster, 
+using a k-nearest-neighbor-enhanced discriminator to resolve ambiguous node 
+memberships.
+
+-`nodes_clusters`: A node-centric mapping that preserves the full relationship 
+between the original graph topology and the clusters.
+
+Both they are available in:
+
+```{r,clustering-3, fig.width=10, fig.height=10, warning=FALSE, eval=TRUE}
+str(TDA_obj@clustering)
+```
+
+
+### Export data for Cytoscape
 
 Cytoscape is a well-known tool to handle, process and analyze networks
 [@shannon2003cytoscape]. Two files are needed to generate and enrich network in
@@ -438,8 +611,9 @@ biological function.For example, orange and yellow clusters have a similar
 average expression of Igfpb7 (bottom-right) but different expression level of
 Aprt (bottom-left).
 
-# Session Info {.unnumbered}
 
+
+# Session Info {.unnumbered}
 ```{r session_info}
 sessionInfo()
 ```

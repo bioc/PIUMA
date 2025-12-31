@@ -17,13 +17,10 @@ subsetting vascular endothelial cells (cell type) by Seurat object,
 extracting raw counts and metadata. Thus, we filtered low expressed genes
 and normalized data by DaMiRseq}
 \format{
-A matrix containing 1180 rows (cells) and 838 columns (genes)
+A matrix with 1180 rows (cells) and 838 columns (genes).
 }
 \usage{
-vascEC_norm
-}
-\value{
-An example dataset for \code{PIUMA} package
+data(vascEC_norm)
 }
 \description{
 We tested PIUMA on a subset of the single-cell RNA Sequencing dataset

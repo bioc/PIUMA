@@ -33,5 +33,11 @@ identified by TDA}
 
 \item{\code{node_data_mat}}{A data.frame with the node size and the average value
 of each feature}
+
+\item{\code{graph}}{A list containing the igraph object of your Jaccard matrix,
+metrics and intermediary objects}
+
+\item{\code{clustering}}{A data.frame containing clusters from TDA on nodes and
+cells}
 }}
 

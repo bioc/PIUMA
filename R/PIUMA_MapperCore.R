@@ -2,7 +2,8 @@
 #'
 #' @description This is a comprehensive function permitting to perform the core
 #' TDA Mapper algorithm with 2D lenses. It allow setting several types of
-#' clustering methods.
+#' clustering methods. There is no restriction to \code{nBins}
+#' and \code{mClustNode}, so the user can tune those for parameter search.
 #'
 #' @param x A TDAobj object, processed by the  \code{\link{dfToDistance}} and
 #' \code{\link{dfToProjection}} functions.
@@ -25,40 +26,46 @@
 #'  identified by TDA .
 #'
 #'
-#' @author Mattia Chiesa, Laura Ballarini, Luca Piacentini
+#' @author Mattia Chiesa, Laura Ballarini, Luca Piacentini, Carlo Leonardi
 #'
 #' @examples
 #' # use example data:
-#' data(tda_test_data)
-#' set.seed(1)
-#' dfMapper <- mapperCore(tda_test_data, nBins=5, overlap=0.5,
-#' mClustNode=2, clustMeth="kmeans")
-#'
+#' data(vascEC_norm)
+#' data(vascEC_meta)
+#' df_TDA <- cbind(vascEC_meta, vascEC_norm)
+#' df_TDA <- makeTDAobj(df_TDA,outcomes = c("stage","zone"))
+#' df_TDA <- dfToDistance(df_TDA,'euclidean')
+#' df_TDA <- dfToProjection(df_TDA, "PCA", nComp = 2)
+#' df_TDA <- mapperCore(df_TDA,
+#'           nBins = 5, overlap = 0.5,
+#'           mClustNode = 2, clustMeth = "kmeans")
 #' @seealso
 #' \code{\link{makeTDAobj}},
 #' \code{\link{dfToDistance}},
 #' \code{\link{dfToProjection}}
 #'
 #' @export
-#'
-mapperCore <- function (x, nBins = 15, overlap = 0.4,
-                        mClustNode = 2, remEmptyNode = TRUE,
-                        clustMeth = c("kmeans","HR", "DBSCAN", "OPTICS"),
-                        HRMethod = c("average", "complete")) {
-
+mapperCore <- function(x, nBins = 15, overlap = 0.4,
+                       mClustNode = 2, remEmptyNode = TRUE,
+                       clustMeth = c("kmeans", "HR", "DBSCAN", "OPTICS"),
+                       HRMethod = c("average", "complete")) {
   # checks-------------------
-  if (!is(x,'TDAobj'))
+  if (!is(x, "TDAobj")) {
     stop("'x' argument must be a TDAobj object")
+  }
 
   dfDistances <- getDistMat(x)
+  dfDistances <- as.data.frame(dfDistances)
   df2Dlens <- getComp(x)
 
   # check missing arguments
-  if (missing(dfDistances))
+  if (missing(dfDistances)) {
     stop("'dfDistances' argument must be provided")
+  }
 
-  if (missing(df2Dlens))
+  if (missing(df2Dlens)) {
     stop("'df2Dlens' argument must be provided")
+  }
 
   if (missing(clustMeth)) {
     clustMeth <- clustMeth[1]
@@ -69,112 +76,140 @@ mapperCore <- function (x, nBins = 15, overlap = 0.4,
   }
 
   # check the type of argument
-  if (!is.data.frame(dfDistances))
+  if (!is.data.frame(dfDistances)) {
     stop("'dfDistances' argument must be a data.frame")
+  }
 
-  if (!is.data.frame(df2Dlens))
+  if (!is.data.frame(df2Dlens)) {
     stop("'df2Dlens' argument must be a data.frame")
+  }
 
-  if (!is.numeric(nBins))
+  if (!is.numeric(nBins)) {
     stop("'nBins' argument must be numeric")
+  }
 
-  if (!is.numeric(overlap))
+  if (!is.numeric(overlap)) {
     stop("'overlap' argument must be numeric")
+  }
 
-  if (!is.numeric(mClustNode))
+  if (!is.numeric(mClustNode)) {
     stop("'mClustNode' argument must be numeric")
+  }
 
-  if (!is.logical(remEmptyNode))
+  if (!is.logical(remEmptyNode)) {
     stop("'remEmptyNode' argument must be logical")
+  }
 
-  if (!is.character(clustMeth))
+  if (!is.character(clustMeth)) {
     stop("'clustMeth' argument must be a string")
+  }
 
-  if (!is.character(HRMethod))
+  if (!is.character(HRMethod)) {
     stop("'HRMethod' argument must be a string")
+  }
 
   # specific checks
-  if (nrow(dfDistances) != nrow(df2Dlens))
+  if (nrow(dfDistances) != nrow(df2Dlens)) {
     stop("n. of rows 'dfDistances' must be equal to n. of rows 'df2Dlens'")
+  }
 
-  if(ncol(df2Dlens) != 2)
+  if (ncol(df2Dlens) != 2) {
     stop("ncol(df2Dlens) must be equal to 2")
+  }
 
-  if (nrow(dfDistances) < 10 & nrow(df2Dlens) < 10)
+  if (nrow(dfDistances) < 10 & nrow(df2Dlens) < 10) {
     stop("n. 'dfDistances' and 'df2Dlens' rows greater than 10")
+  }
 
 
-  if (!(all(vapply(dfDistances, is.numeric,logical(1))) |
-        all(vapply(dfDistances, is.integer,logical(1))))
-  )
+  if (!(all(vapply(dfDistances, is.numeric, logical(1))) |
+    all(vapply(dfDistances, is.integer, logical(1))))
+  ) {
     stop("'dfDistances' variables must be numeric")
+  }
 
 
-  if (!(all(vapply(df2Dlens, is.numeric,logical(1))) |
-        all(vapply(df2Dlens, is.integer,logical(1))))
-  )
+  if (!(all(vapply(df2Dlens, is.numeric, logical(1))) |
+    all(vapply(df2Dlens, is.integer, logical(1))))
+  ) {
     stop("'df2Dlens' variables must be numeric")
+  }
 
-  if (!isSymmetric.matrix(as.matrix(dfDistances)))
+  if (!isSymmetric.matrix(as.matrix(dfDistances))) {
     stop("'dfDistances' is not symmetric. Please be sure it is a dataframe of
             distances")
+  }
 
   if (isSymmetric.matrix(as.matrix(dfDistances)) &
-      sum(diag(as.matrix(dfDistances))) != 0)
+    sum(diag(as.matrix(dfDistances))) != 0) {
     stop("'dfDistances' is symmetric, but with trace != 0. Please be sure it
             is a dataframe of distances (dissimilarities)")
+  }
 
-  if (length(nBins) > 1)
+  if (length(nBins) > 1) {
     stop("length(nBins) must be equal to 1")
+  }
 
-  if ((nBins %% 1) != 0)
+  if ((nBins %% 1) != 0) {
     stop("nBins must be integers")
+  }
 
-  if (!(nBins>1 & nBins <= 100))
-    stop("nBins must be in [2; 100]")
+  if (length(nBins) != 1 || (nBins %% 1) != 0 || nBins < 2) {
+    stop("'nBins' must be a single integer >= 2")
+  }
 
-  if (length(overlap) > 1)
+  if (length(overlap) > 1) {
     stop("length(overlap) must be equal to 1")
+  }
 
-  if (!(overlap > 0 & overlap < 1))
+  if (!(overlap > 0 & overlap < 1)) {
     stop("'overlap' must be in (0; 1)")
+  }
 
-  if (length(mClustNode) > 1)
+  if (length(mClustNode) > 1) {
     stop("length(mClustNode) must be equal to 1")
+  }
 
-  if ((mClustNode %% 1) != 0)
-    stop("'mClustNode' must be an integer")
+  if ((mClustNode %% 1) != 0 || mClustNode < 1) {
+    stop("'mClustNode' must be an integer >= 1")
+  }
 
-  if (!(mClustNode >=1 & mClustNode <= 15))
-    stop("'mClustNode' must be [1; 15]")
-
-  if (length(remEmptyNode) > 1)
+  if (length(remEmptyNode) > 1) {
     stop("length(remEmptyNode) must be equal to 1")
+  }
 
-  if (length(clustMeth) > 1)
+  if (length(clustMeth) > 1) {
     stop("length(clustMeth) must be equal to 1")
+  }
 
-  if (!(clustMeth %in% c("kmeans","HR", "DBSCAN", "OPTICS")))
+  if (!(clustMeth %in% c("kmeans", "HR", "DBSCAN", "OPTICS"))) {
     stop("'clustMeth' must be one of 'kmeans', 'HR', 'DBSCAN', 'OPTICS'")
+  }
 
-  if (length(HRMethod) > 1)
+  if (length(HRMethod) > 1) {
     stop("length(HRMethod) must be equal to 1")
+  }
 
-  if (!(HRMethod %in% c("average", "complete")))
+  if (!(HRMethod %in% c("average", "complete"))) {
     stop("'HRMethod' must be one of 'average', 'complete'")
+  }
 
   # check the presence of NA or Inf
-  if (any(is.na(dfDistances)))
+  if (any(is.na(dfDistances))) {
     stop("NA values are not allowed in the 'dfDistances' data.frame")
+  }
 
-  if (any(is.infinite(as.matrix(dfDistances))))
+  if (any(is.infinite(as.matrix(dfDistances)))) {
     stop("Inf values are not allowed in the 'dfDistances' data.frame")
+  }
 
-  if (any(is.na(df2Dlens)))
+  if (any(is.na(df2Dlens))) {
     stop("NA values are not allowed in the 'df2Dlens' data.frame")
+  }
 
-  if (any(is.infinite(as.matrix(df2Dlens))))
+  if (any(is.infinite(as.matrix(df2Dlens)))) {
     stop("Inf values are not allowed in the 'df2Dlens' data.frame")
+  }
 
   # initializations----------------------------------
   nBins[2] <- nBins
@@ -189,8 +224,8 @@ mapperCore <- function (x, nBins = 15, overlap = 0.4,
   maxFilt2 <- max(df2Dlens[, 2])
 
   # interval length  for axis x (lenBin1) and y (lenBin2)
-  lenBin1 <- (maxFilt1 - minFilt1)/(nBins[1] - (nBins[1] - 1) * overlap)
-  lenBin2 <- (maxFilt2 - minFilt2)/(nBins[2] - (nBins[2] - 1) * overlap)
+  lenBin1 <- (maxFilt1 - minFilt1) / (nBins[1] - (nBins[1] - 1) * overlap)
+  lenBin2 <- (maxFilt2 - minFilt2) / (nBins[2] - (nBins[2] - 1) * overlap)
 
   stepSize1 <- lenBin1 * (1 - overlap)
   stepSize2 <- lenBin2 * (1 - overlap)
@@ -202,7 +237,6 @@ mapperCore <- function (x, nBins = 15, overlap = 0.4,
 
   # main loop-----------------------------------------------------
   for (sector in seq_len(numSectors)) {
-
     sector1 <- sectorIdx1[sector]
     sector2 <- sectorIdx2[sector]
 
@@ -213,112 +247,115 @@ mapperCore <- function (x, nBins = 15, overlap = 0.4,
     maxValueInSector2 <- minValueInSector2 + lenBin2
 
     # find points in sector
-    pointsInSectorLogical <- (minValueInSector1 <= df2Dlens[,1]) &
-      (minValueInSector2 <= df2Dlens[,2]) &
-      (df2Dlens[,1] <= maxValueInSector1) &
-      (df2Dlens[,2] <= maxValueInSector2)
-    pointsInSectorIdx <- rownames(df2Dlens[which(pointsInSectorLogical),])
+    pointsInSectorLogical <- (minValueInSector1 <= df2Dlens[, 1]) &
+      (minValueInSector2 <= df2Dlens[, 2]) &
+      (df2Dlens[, 1] <= maxValueInSector1) &
+      (df2Dlens[, 2] <= maxValueInSector2)
+    pointsInSectorIdx <- rownames(df2Dlens[which(pointsInSectorLogical), ])
 
     numPointsInSector <- sum(pointsInSectorLogical)
 
     # if to build the resulting df (i.e. 'pointsInNodeDf')
     if (numPointsInSector > mClustNode) {
       sectorDfDistances <- as.dist(as.matrix(dfDistances)
-                                   [pointsInSectorLogical,
-                                     pointsInSectorLogical])
+      [
+        pointsInSectorLogical,
+        pointsInSectorLogical
+      ])
 
       # clustering
-      switch(clustMeth, "HR"={
+      switch(clustMeth,
+        "HR" = {
+          HRClust <- hclust(sectorDfDistances, method = HRMethod)
+          # cut the dendrogram in order to create the desired number of clusters
+          dfClust <- cutree(HRClust, k = mClustNode)
+        },
+        "kmeans" = {
+          clustInSector <- kmeans(sectorDfDistances, mClustNode,
+            iter.max = 10,
+            nstart = 1, trace = FALSE
+          )
+          dfClust <- clustInSector$cluster
+        },
+        "DBSCAN" = {
+          # find knn
+          knnValY <- sort(kNNdist(
+            sectorDfDistances,
+            round(log(nrow(as.matrix(sectorDfDistances))))
+          ))
+          knnPointsX <- seq(from = 1, to = length(knnValY))
 
-        HRClust <- hclust(sectorDfDistances, method=HRMethod)
-        # cut the dendrogram in order to create the desired number of clusters
-        dfClust <- cutree(HRClust, k = mClustNode)
+          # interpolation function
+          apprFunct <- approx(knnPointsX, knnValY, n = 1000)
+          knnPointsX <- apprFunct$x
+          knnValY <- apprFunct$y
 
-      }, "kmeans"={
+          # second derivative computation
+          der1 <- diff(knnValY) / diff(knnPointsX)
+          der2 <- diff(der1) / diff(knnPointsX[-1])
 
-        clustInSector <- kmeans(sectorDfDistances, mClustNode, iter.max = 10,
-                                nstart = 1, trace = FALSE)
-        dfClust<-clustInSector$cluster
+          # find the elbow point
+          indices <- which(der2 == max(abs(der2)))
+          elbow <- knnValY[indices]
+          if (length(elbow) > 1) {
+            elbow <- mean(elbow)
+          } else if (length(elbow) < 1) {
+            elbow <- mean(knnValY)
+          }
 
-      }, "DBSCAN"={
-
-        # find knn
-        knnValY <- sort(kNNdist(sectorDfDistances,
-                                round(log(nrow(as.matrix(sectorDfDistances)))
-                                      )
-                                )
-                        )
-        knnPointsX <- seq(from = 1, to = length(knnValY))
-
-        # interpolation function
-        apprFunct <- approx(knnPointsX, knnValY, n = 1000)
-        knnPointsX <- apprFunct$x
-        knnValY <- apprFunct$y
-
-        # second derivative computation
-        der1 <- diff(knnValY) / diff(knnPointsX)
-        der2 <- diff(der1) / diff(knnPointsX[-1])
-
-        # find the elbow point
-        indices <- which(der2 == max(abs(der2)))
-        elbow <- knnValY[indices]
-        if(length(elbow) > 1) {
-          elbow <- mean(elbow)
-        }else if(length(elbow) < 1) {
-          elbow <- mean(knnValY)
+          clustInSector <- dbscan(sectorDfDistances,
+            eps = elbow,
+            minPts = round(log(nrow(as.matrix(sectorDfDistances))))
+          )
+          dfClust <- clustInSector$cluster
+        },
+        "OPTICS" = {
+          optClust <- optics(sectorDfDistances,
+            minPts = round(log(nrow(as.matrix(sectorDfDistances))))
+          )
+          clustInSector <- extractDBSCAN(optClust, eps_cl = (optClust$eps / 2))
+          dfClust <- clustInSector$cluster
         }
-
-        clustInSector <- dbscan(sectorDfDistances,
-                                eps = elbow,
-                      minPts = round(log(nrow(as.matrix(sectorDfDistances)))))
-        dfClust <- clustInSector$cluster
-
-      }, "OPTICS"={
-
-        optClust <- optics(sectorDfDistances,
-                    minPts = round(log(nrow(as.matrix(sectorDfDistances)))))
-        clustInSector <- extractDBSCAN(optClust, eps_cl = (optClust$eps/2))
-        dfClust <- clustInSector$cluster
-
-      })
+      )
 
       dfSectorCluster <- cbind(pointsInSectorIdx, dfClust)
       clusterUniq <- sort(unique(dfSectorCluster[, 2]))
 
       for (i in seq_len(length(clusterUniq))) {
         pointsInNodeDf[k, 1] <- gsub(",", "", toString(dfSectorCluster[
-          which(dfSectorCluster[, 2] == i), 1]))
+          which(dfSectorCluster[, 2] == i), 1
+        ]))
         rownames(pointsInNodeDf)[k] <- paste0("node_", sector, "_cl_", i)
         k <- k + 1
       }
-
     } else {
-
-      pointsInNodeDf[k, 1] <- gsub(",","", toString(pointsInSectorIdx))
+      pointsInNodeDf[k, 1] <- gsub(",", "", toString(pointsInSectorIdx))
       rownames(pointsInNodeDf)[k] <- paste0("node_", sector, "_cl_1")
       k <- k + 1
-
     }
   }
   colnames(pointsInNodeDf) <- "sample_x_cluster"
 
   # remove empty nodes-----------------------------------
-  if (remEmptyNode==TRUE) {
-    '%!in%' <- function(x,y)!('%in%'(x,y))
+  if (remEmptyNode == TRUE) {
+    "%!in%" <- function(x, y) !("%in%"(x, y))
     pointsInNodeDf <- pointsInNodeDf[
-      which(pointsInNodeDf[,"sample_x_cluster"] %!in% ""),, drop=FALSE]
+      which(pointsInNodeDf[, "sample_x_cluster"] %!in% ""), ,
+      drop = FALSE
+    ]
   }
 
   # remove identical nodes (only shared samples): leave-one-out
   uniq_nodes <- unique(pointsInNodeDf$sample_x_cluster)
-  for (i in seq_len(length(uniq_nodes))){
+  for (i in seq_len(length(uniq_nodes))) {
     idx <- which(pointsInNodeDf$sample_x_cluster %in% uniq_nodes[i])
-    if(length(idx) > 1){
+    if (length(idx) > 1) {
       idx_bad <- idx[2:length(idx)]
       pointsInNodeDf[idx_bad, "sample_x_cluster"] <- NA
     }
   }
-  pointsInNodeDf <- pointsInNodeDf[complete.cases(pointsInNodeDf),,drop=FALSE]
+  pointsInNodeDf <- pointsInNodeDf[complete.cases(pointsInNodeDf), ,
+                                   drop = FALSE]
 
   x <- setDfMapper(x, pointsInNodeDf)
   return(x)

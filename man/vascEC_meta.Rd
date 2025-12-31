@@ -5,13 +5,10 @@
 \alias{vascEC_meta}
 \title{Example datasets for PIUMA package}
 \format{
-A dataframe containing 1180 rows (cells) and 2 columns (outcomes)
+A data frame with 1180 rows (cells) and 2 columns (outcomes).
 }
 \usage{
-vascEC_meta
-}
-\value{
-An example dataset for \code{PIUMA} package
+data(vascEC_meta)
 }
 \description{
 We tested PIUMA on a subset of the single-cell RNA Sequencing dataset

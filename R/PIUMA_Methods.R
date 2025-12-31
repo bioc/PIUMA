@@ -14,12 +14,14 @@
 #' data(tda_test_data)
 #' ex_out <- getOrigData(tda_test_data)
 #' @export
-setMethod("getOrigData",
-          c(x="TDAobj"),
-          function(x){
-              out_df <- x@orig_data
-              return(out_df)
-          })
+setMethod(
+  "getOrigData",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@orig_data
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'orig_data' slot of a TDAobj object.
 #'
@@ -37,12 +39,14 @@ setMethod("getOrigData",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setOrigData",
-          c(x = "TDAobj"),
-          function(x, y){
-              x@orig_data <- y
-              return(x)
-          })
+setMethod(
+  "setOrigData",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@orig_data <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'scaled_data' slot of a TDAobj object.
 #'
@@ -60,12 +64,14 @@ setMethod("setOrigData",
 #' data(tda_test_data)
 #' ex_out <- getScaledData(tda_test_data)
 #' @export
-setMethod("getScaledData",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@scaled_data
-              return(out_df)
-          })
+setMethod(
+  "getScaledData",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@scaled_data
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'scaled_data' slot of a TDAobj object.
 #'
@@ -83,12 +89,14 @@ setMethod("getScaledData",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setScaledData",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@scaled_data <- y
-              return(x)
-          })
+setMethod(
+  "setScaledData",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@scaled_data <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'outcomeFact' slot of a TDAobj object.
 #'
@@ -106,12 +114,14 @@ setMethod("setScaledData",
 #' data(tda_test_data)
 #' ex_out <- getOutcomeFact(tda_test_data)
 #' @export
-setMethod("getOutcomeFact",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@outcomeFact
-              return(out_df)
-          })
+setMethod(
+  "getOutcomeFact",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@outcomeFact
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'outcomeFact' slot of a TDAobj object.
 #'
@@ -129,12 +139,14 @@ setMethod("getOutcomeFact",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setOutcomeFact",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@outcomeFact <- y
-              return(x)
-          })
+setMethod(
+  "setOutcomeFact",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@outcomeFact <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'outcome' slot of a TDAobj object.
 #'
@@ -152,12 +164,14 @@ setMethod("setOutcomeFact",
 #' data(tda_test_data)
 #' ex_out <- getOutcome(tda_test_data)
 #' @export
-setMethod("getOutcome",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@outcome
-              return(out_df)
-          })
+setMethod(
+  "getOutcome",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@outcome
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'outcome' slot of a TDAobj object.
 #'
@@ -175,12 +189,14 @@ setMethod("getOutcome",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setOutcome",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@outcome <- y
-              return(x)
-          })
+setMethod(
+  "setOutcome",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@outcome <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'comp' slot of a TDAobj object.
 #'
@@ -198,12 +214,14 @@ setMethod("setOutcome",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("getComp",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@comp
-              return(out_df)
-          })
+setMethod(
+  "getComp",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@comp
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'comp' slot of a TDAobj object.
 #'
@@ -221,12 +239,14 @@ setMethod("getComp",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setComp",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@comp <- y
-              return(x)
-          })
+setMethod(
+  "setComp",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@comp <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'dist_mat' slot of a TDAobj object.
 #'
@@ -244,12 +264,14 @@ setMethod("setComp",
 #' data(tda_test_data)
 #' ex_out <- getDistMat(tda_test_data)
 #' @export
-setMethod("getDistMat",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@dist_mat
-              return(out_df)
-          })
+setMethod(
+  "getDistMat",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@dist_mat
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'dist_mat' slot of a TDAobj object.
 #'
@@ -267,12 +289,14 @@ setMethod("getDistMat",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setDistMat",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@dist_mat <- y
-              return(x)
-          })
+setMethod(
+  "setDistMat",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@dist_mat <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'dfMapper' slot of a TDAobj object.
 #'
@@ -290,12 +314,14 @@ setMethod("setDistMat",
 #' data(tda_test_data)
 #' ex_out <- getDfMapper(tda_test_data)
 #' @export
-setMethod("getDfMapper",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@dfMapper
-              return(out_df)
-          })
+setMethod(
+  "getDfMapper",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@dfMapper
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'dfMapper' slot of a TDAobj object.
 #'
@@ -313,12 +339,14 @@ setMethod("getDfMapper",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setDfMapper",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@dfMapper <- y
-              return(x)
-          })
+setMethod(
+  "setDfMapper",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@dfMapper <- y
+    return(x)
+  }
+)
 
 #' @title Getter method for the 'jacc' slot of a TDAobj object.
 #'
@@ -336,12 +364,14 @@ setMethod("setDfMapper",
 #' data(tda_test_data)
 #' ex_out <- getJacc(tda_test_data)
 #' @export
-setMethod("getJacc",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@jacc
-              return(out_df)
-          })
+setMethod(
+  "getJacc",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@jacc
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'jacc' slot of a TDAobj object.
 #'
@@ -359,12 +389,119 @@ setMethod("getJacc",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setJacc",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@jacc <- y
-              return(x)
-          })
+setMethod(
+  "setJacc",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@jacc <- y
+    return(x)
+  }
+)
+
+
+
+#' @title Getter method for the 'graph' slot of a TDAobj object.
+#'
+#' @description The method to get igraph object from the graph slot
+#'
+#' @docType methods
+#' @rdname getGraph
+#' @aliases getGraph getGraph,PIUMA-getGraph
+#' @param x a \code{TDAobj} object
+#' @return an igraph object
+#'
+#' @author Carlo Leonardi
+#'
+#' @examples
+#' data(tda_test_data)
+#' @export
+setMethod(
+  "getGraph",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@graph$igraph
+    return(out_df)
+  }
+)
+
+
+#' @title Setter method for the 'graph' slot of a TDAobj object.
+#'
+#' @description The method to set igraph object to the graph slot
+#'
+#' @docType methods
+#' @rdname setGraph
+#' @aliases setGraph setGraph,PIUMA-setGraph
+#' @param x a \code{TDAobj} object
+#' @return a \code{TDAobj} object
+#'
+#' @author Carlo Leonardi
+#'
+#' @examples
+#' data(tda_test_data)
+#' @export
+setMethod(
+  "setGraph",
+  c(x = "TDAobj"),
+  function(x) {
+    y <- getJacc(x)
+    y[is.na(y)] <- 0
+    y[y > 0] <- 1
+    y <- igraph::graph_from_adjacency_matrix(y, mode = "undirected")
+    x@graph$igraph <- y
+    return(x)
+  }
+)
+
+
+#' @title Getter method for the 'clustering' slot of a TDAobj object.
+#'
+#' @description The method to get clusters from the clustering slot
+#'
+#' @docType methods
+#' @rdname getClusters
+#' @aliases getClusters getClusters,PIUMA-getClusters
+#' @param x a \code{TDAobj} object
+#' @return a data.frame
+#'
+#' @author Carlo Leonardi
+#'
+#' @examples
+#' data(tda_test_data)
+#' @export
+setMethod(
+  "getClusters",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@clustering
+    return(out_df)
+  }
+)
+
+
+#' @title Getter method for the 'metrics' slot under 'graph' of a TDAobj object.
+#'
+#' @description The method to get metrics from the graph slot
+#'
+#' @docType methods
+#' @rdname getMetrics
+#' @aliases getMetrics getMetric,PIUMA-getMetrics
+#' @param x a \code{TDAobj} object
+#' @return a vector
+#'
+#' @author Carlo Leonardi, Mattia Chiesa
+#'
+#' @examples
+#' data(tda_test_data)
+#' @export
+setMethod(
+  "getMetrics",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@graph$metrics
+    return(out_df)
+  }
+)
 
 #' @title Getter method for the 'node_data_mat' slot of a TDAobj object.
 #'
@@ -382,12 +519,14 @@ setMethod("setJacc",
 #' data(tda_test_data)
 #' ex_out <- getNodeDataMat(tda_test_data)
 #' @export
-setMethod("getNodeDataMat",
-          c(x = "TDAobj"),
-          function(x){
-              out_df <- x@node_data_mat
-              return(out_df)
-          })
+setMethod(
+  "getNodeDataMat",
+  c(x = "TDAobj"),
+  function(x) {
+    out_df <- x@node_data_mat
+    return(out_df)
+  }
+)
 
 #' @title Setter method for the 'node_data_mat' slot of a TDAobj object.
 #'
@@ -405,9 +544,11 @@ setMethod("getNodeDataMat",
 #' @examples
 #' data(tda_test_data)
 #' @export
-setMethod("setNodeDataMat",
-          c(x = "TDAobj"),
-          function(x,y){
-              x@node_data_mat <- y
-              return(x)
-          })
+setMethod(
+  "setNodeDataMat",
+  c(x = "TDAobj"),
+  function(x, y) {
+    x@node_data_mat <- y
+    return(x)
+  }
+)

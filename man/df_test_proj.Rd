@@ -6,13 +6,10 @@
 \title{A dataset to test the \code{\link{dfToProjection}} and
 \code{\link{dfToDistance}} funtions of \code{PIUMA} package.}
 \format{
-A data.frame containing 15 rows (cells) and 15 columns (genes)
+A data frame with 15 rows (cells) and 15 columns (genes).
 }
 \usage{
-df_test_proj
-}
-\value{
-An example dataset for \code{PIUMA} package
+data(df_test_proj)
 }
 \description{
 A dataset to test the \code{\link{dfToProjection}} and

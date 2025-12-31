@@ -1,90 +1,110 @@
 #' @rdname getOrigData
 #' @export
-setGeneric("getOrigData", function(x){
-    standardGeneric("getOrigData")
+setGeneric("getOrigData", function(x) {
+  standardGeneric("getOrigData")
 })
 #' @rdname setOrigData
 #' @export
-setGeneric("setOrigData", function(x,y){
-    standardGeneric("setOrigData")
+setGeneric("setOrigData", function(x, y) {
+  standardGeneric("setOrigData")
 })
 #' @rdname getScaledData
 #' @export
-setGeneric("getScaledData", function(x){
-    standardGeneric("getScaledData")
+setGeneric("getScaledData", function(x) {
+  standardGeneric("getScaledData")
 })
 #' @rdname setScaledData
 #' @export
-setGeneric("setScaledData", function(x,y){
-    standardGeneric("setScaledData")
+setGeneric("setScaledData", function(x, y) {
+  standardGeneric("setScaledData")
 })
 #' @rdname getOutcomeFact
 #' @export
-setGeneric("getOutcomeFact", function(x){
-    standardGeneric("getOutcomeFact")
+setGeneric("getOutcomeFact", function(x) {
+  standardGeneric("getOutcomeFact")
 })
 #' @rdname setOutcomeFact
 #' @export
-setGeneric("setOutcomeFact", function(x,y){
-    standardGeneric("setOutcomeFact")
+setGeneric("setOutcomeFact", function(x, y) {
+  standardGeneric("setOutcomeFact")
 })
 #' @rdname getOutcome
 #' @export
-setGeneric("getOutcome", function(x){
-    standardGeneric("getOutcome")
+setGeneric("getOutcome", function(x) {
+  standardGeneric("getOutcome")
 })
 #' @rdname setOutcome
 #' @export
-setGeneric("setOutcome", function(x,y){
-    standardGeneric("setOutcome")
+setGeneric("setOutcome", function(x, y) {
+  standardGeneric("setOutcome")
 })
 #' @rdname getComp
 #' @export
-setGeneric("getComp", function(x){
-    standardGeneric("getComp")
+setGeneric("getComp", function(x) {
+  standardGeneric("getComp")
 })
 #' @rdname setComp
 #' @export
-setGeneric("setComp", function(x,y){
-    standardGeneric("setComp")
+setGeneric("setComp", function(x, y) {
+  standardGeneric("setComp")
 })
 #' @rdname getDistMat
 #' @export
-setGeneric("getDistMat", function(x){
-    standardGeneric("getDistMat")
+setGeneric("getDistMat", function(x) {
+  standardGeneric("getDistMat")
 })
 #' @rdname setDistMat
 #' @export
-setGeneric("setDistMat", function(x,y){
-    standardGeneric("setDistMat")
+setGeneric("setDistMat", function(x, y) {
+  standardGeneric("setDistMat")
 })
 #' @rdname getDfMapper
 #' @export
-setGeneric("getDfMapper", function(x){
-    standardGeneric("getDfMapper")
+setGeneric("getDfMapper", function(x) {
+  standardGeneric("getDfMapper")
 })
 #' @rdname setDfMapper
 #' @export
-setGeneric("setDfMapper", function(x,y){
-    standardGeneric("setDfMapper")
+setGeneric("setDfMapper", function(x, y) {
+  standardGeneric("setDfMapper")
 })
 #' @rdname getJacc
 #' @export
-setGeneric("getJacc", function(x){
-    standardGeneric("getJacc")
+setGeneric("getJacc", function(x) {
+  standardGeneric("getJacc")
 })
 #' @rdname setJacc
 #' @export
-setGeneric("setJacc", function(x,y){
-    standardGeneric("setJacc")
+setGeneric("setJacc", function(x, y) {
+  standardGeneric("setJacc")
+})
+#' @rdname getGraph
+#' @export
+setGeneric("getGraph", function(x) {
+  standardGeneric("getGraph")
+})
+#' @rdname setGraph
+#' @export
+setGeneric("setGraph", function(x) {
+  standardGeneric("setGraph")
+})
+#' @rdname getMetrics
+#' @export
+setGeneric("getMetrics", function(x) {
+  standardGeneric("getMetrics")
+})
+#' @rdname getClusters
+#' @export
+setGeneric("getClusters", function(x) {
+  standardGeneric("getClusters")
 })
 #' @rdname getNodeDataMat
 #' @export
-setGeneric("getNodeDataMat", function(x){
-    standardGeneric("getNodeDataMat")
+setGeneric("getNodeDataMat", function(x) {
+  standardGeneric("getNodeDataMat")
 })
 #' @rdname setNodeDataMat
 #' @export
-setGeneric("setNodeDataMat", function(x,y){
-    standardGeneric("setNodeDataMat")
+setGeneric("setNodeDataMat", function(x, y) {
+  standardGeneric("setNodeDataMat")
 })

@@ -25,7 +25,7 @@ stored in the network.
 \examples{
 # use example data:
 set.seed(1)
-entropy <- checkNetEntropy(round(runif(10),0))
+entropy <- checkNetEntropy(round(runif(10), 0))
 
 }
 \seealso{

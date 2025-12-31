@@ -1,7 +1,7 @@
 Package: PIUMA
 Type: Package
 Title: Phenotypes Identification Using Mapper from topological data Analysis
-Version: 1.7.0
+Version: 1.7.1
 Authors@R: c(
     person("Mattia", "Chiesa", , "mattia.chiesa@cardiologicomonzino.it", 
 	role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7427-9954")),
@@ -14,7 +14,10 @@ Authors@R: c(
 	person("Laura", "Ballarini", , "laura.ballarini01@universitadipavia.it",
 	role = "aut"),
 	person("Luca", "Piacentini", , "luca.piacentini@cardiologicomonzino.it",
-	role = "aut", comment = c(ORCID = "0000-0003-1022-4481"))
+	role = "aut", comment = c(ORCID = "0000-0003-1022-4481")),
+	person("Carlo", "Leonardi", , "cl35@sanger.ac.uk",
+    role = "aut",
+           comment = c(ORCID = "0000-0001-5348-8300"))
   )
 Description: The PIUMA package offers a tidy pipeline of Topological
         Data Analysis frameworks to identify and characterize 
@@ -25,10 +28,12 @@ LazyData: false
 biocViews: Clustering, GraphAndNetwork, DimensionReduction, Network,
      Classification
 VignetteBuilder: knitr
-Imports: cluster, umap, tsne, kernlab, vegan, dbscan, igraph, scales,
-    Hmisc, patchwork, grDevices, stats, methods, SummarizedExperiment
-Suggests: BiocStyle, knitr, testthat, rmarkdown
-Depends: R (>= 4.3), ggplot2
-RoxygenNote: 7.2.3
+Imports: Hmisc, igraph, patchwork, scales, utils, cluster, umap, tsne,
+    kernlab, vegan, dbscan, grDevices, stats, methods, SummarizedExperiment,
+	ggplot2
+Suggests: BiocStyle, testthat, knitr, rmarkdown, Seurat, SeuratData,
+    SingleCellExperiment, aricode, mclust, viridis, magick, ggrepel, dplyr
+Depends: R (>= 4.3)
+RoxygenNote: 7.3.1
 URL: https://github.com/BioinfoMonzino/PIUMA
 BugReports: https://github.com/BioinfoMonzino/PIUMA/issues

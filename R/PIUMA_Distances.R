@@ -16,50 +16,59 @@
 #' @author Mattia Chiesa, Laura Ballarini, Luca Piacentini
 #'
 #' @examples
-#' ## use example data:
-#' data(tda_test_data)
-#' dfDist <- dfToDistance(tda_test_data, "euclidean")
+#' data(vascEC_norm)
+#' data(vascEC_meta)
+#' df_TDA <- cbind(vascEC_meta, vascEC_norm)
+#' df_TDA <- makeTDAobj(df_TDA,outcomes = c("stage","zone"))
+#' df_TDA <- dfToDistance(df_TDA,'euclidean')
 #'
 #' @seealso
 #' \code{\link{makeTDAobj}}
 #'
 #' @export
 #'
-dfToDistance<-function(x, distMethod=c("euclidean", "gower", "pearson")) {
-
+dfToDistance <- function(x, distMethod = c("euclidean", "gower", "pearson")) {
   # checks-------------
-  if (!is(x,'TDAobj'))
+  if (!is(x, "TDAobj")) {
     stop("'x' argument must be a TDAobj object")
+  }
 
   df <- getScaledData(x)
 
   # check missing arguments
-  if (missing(df))
+  if (missing(df)) {
     stop("'df' argument must be provided")
+  }
 
-  if (missing(distMethod)){
+  if (missing(distMethod)) {
     distMethod <- distMethod[1]
   }
 
   # check the type of argument
-  if (!is.data.frame(df))
+  if (!is.data.frame(df)) {
     stop("'df' argument must be a data.frame")
+  }
 
-  if (!is.character(distMethod))
+  if (!is.character(distMethod)) {
     stop("'distMethod' argument must be character")
+  }
 
   # specific checks
-  if (nrow(df) < 10)
+  if (nrow(df) < 10) {
     stop("n. of 'df' row must be greater than 10")
+  }
 
-  if (ncol(df) < 2)
+  if (ncol(df) < 2) {
     stop("n. of 'df'columns must be greater than 2")
+  }
 
-  if (length(distMethod) > 1)
+  if (length(distMethod) > 1) {
     stop("length(distMethod) must be equal to 1")
+  }
 
-  if (!(distMethod %in% c("euclidean", "gower", "pearson")))
+  if (!(distMethod %in% c("euclidean", "gower", "pearson"))) {
     stop("'distMethod' must be one of 'euclidean', 'gower', 'pearson'")
+  }
 
 
   # other more specific 'df' contents checks
@@ -86,39 +95,42 @@ dfToDistance<-function(x, distMethod=c("euclidean", "gower", "pearson")) {
     }
   }
 
-  if (!(all(vapply(df, is.numeric,logical(1))) |
-        all(vapply(df, is.integer,logical(1))))
-      )
+  if (!(all(vapply(df, is.numeric, logical(1))) |
+    all(vapply(df, is.integer, logical(1))))
+  ) {
     stop("'df' variables must be numeric")
+  }
 
 
   # check the presence of NA or Inf
-  if (any(is.na(df)))
+  if (any(is.na(df))) {
     stop("NA values are not allowed in the 'df' data.frame")
+  }
 
-  if (any(is.infinite(as.matrix(df))))
+  if (any(is.infinite(as.matrix(df)))) {
     stop("Inf values are not allowed in the 'df' data.frame")
+  }
 
 
   # distance computation (body)-----
-  switch(distMethod, "euclidean"={
-
-    distance<-dist(df, method=distMethod)
-    dfDist<-as.data.frame(as.matrix(distance))
-
-  }, "gower"={
-    dfDist <- as.data.frame(as.matrix(daisy(df, metric = "gower",
-                                            stand = FALSE,
-                                            warnType = FALSE)))
-
-  }, "pearson"={
-    dfDist <- as.data.frame(1-cor(t(df)), method="pearson")
-
-  }
+  switch(distMethod,
+    "euclidean" = {
+      distance <- dist(df, method = distMethod)
+      dfDist <- as.data.frame(as.matrix(distance))
+    },
+    "gower" = {
+      dfDist <- as.data.frame(as.matrix(daisy(df,
+        metric = "gower",
+        stand = FALSE,
+        warnType = FALSE
+      )))
+    },
+    "pearson" = {
+      dfDist <- as.data.frame(1 - cor(t(df)), method = "pearson")
+    }
   )
 
-  x <- setDistMat(x, dfDist)
+  x <- setDistMat(x, as.matrix(dfDist))
 
   return(x)
-
 }

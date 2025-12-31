@@ -1,3 +1,9 @@
+Version 1.8.0
+  o PIUMA now identifies clusters and can be easily integrated in the Seurat
+    workflow
+
+----------------
+
 Version 1.0.0
   o PIUMA has been released!
 

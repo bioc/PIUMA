@@ -5,15 +5,12 @@
 \alias{tda_test_data}
 \title{A TDAobj to test the \code{PIUMA} package.}
 \format{
-A TDAobj with data in all slots
+A \code{TDAobj}.
 }
 \usage{
-tda_test_data
-}
-\value{
-An example dataset for \code{PIUMA} package
+data(tda_test_data)
 }
 \description{
-A TDAobj to test the \code{PIUMA} package.
+A \code{TDAobj} with data in all slots for testing.
 }
 \keyword{datasets}

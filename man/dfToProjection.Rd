@@ -72,10 +72,11 @@ high dimensional space into a low dimensional space, wrapping 6 well-knwon
  used as lenses.
 }
 \examples{
-# use example data:
-data(tda_test_data)
-set.seed(1)
-cmp <- dfToProjection(tda_test_data,  "PCA", nComp=2)
+data(vascEC_norm)
+data(vascEC_meta)
+df_TDA <- cbind(vascEC_meta, vascEC_norm)
+df_TDA <- makeTDAobj(df_TDA,outcomes = c("stage","zone"))
+df_TDA <- dfToProjection(df_TDA,'PCA',nComp=2)
 
 }
 \seealso{
