@@ -20,9 +20,5 @@ if (!require("BiocManager", quietly = TRUE))
 BiocManager::install("PIUMA")
 ```
 
-Laura Ballarini, Alessia Gerbasi, Giuseppe Albi, Arianna Dagliati, Luca Piacentini, Carlo Leonardi and Mattia Chiesa
-
-## Do you need help?
-Contact us at:
-mattia.chiesa@cardiologicomonzino.it
+Mattia Chiesa, Laura Ballarini, Alessia Gerbasi, Giuseppe Albi, Arianna Dagliati, Luca Piacentini and Carlo Leonardi
 
